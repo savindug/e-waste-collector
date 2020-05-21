@@ -14,7 +14,7 @@
 
       <section class="mt-2" v-if="this.userdata.ongoing">
         <div class="card ongoing-card">
-          <h1 class="title is-4">Ongoing Job</h1>
+          <h1 class="title is-4 ongoing-title">Ongoing Job</h1>
           <div class="columns mt-1">
             <div class="column is-2"></div>
             <div class="column is-3 has-text-centered justify-content-center self-aligned-center">
@@ -26,7 +26,8 @@
               <p><b>Address:</b> {{ this.ongoingjob.pickupAddress }}</p>
               <p><b>Item Category:</b> {{ this.ongoingjob.itemCategory }}</p>
               <p><b>Sub Category:</b> {{ this.ongoingjob.subCategory }}</p>
-              <button class="button is-danger mt-1" disabled>Cancel</button>
+              <button class="button is-danger mt-1">Cancel</button>
+              <button class="button is-success mt-1 ml-1">Mark as completed</button>
             </div>
             <div class="column is-2"></div>
           </div>
