@@ -62,6 +62,7 @@ export default {
             this.$router.go({ path: this.$router.path })
           },
           err =>{
+            this.isloading = false
             this.error = err.message
           }
         )

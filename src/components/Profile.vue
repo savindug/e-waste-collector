@@ -53,15 +53,6 @@
                   </div>
                 </div>
                 <div class="field">
-                  <label class="label">Age</label>
-                  <div class="control has-text-left">
-                    <input class="input" type="text" placeholder="Text input"
-                    v-model.trim='$v.userdata.age.$model'
-                    >
-                  </div>
-                  <p class="help is-danger" v-if="!$v.userdata.age.required">Age is Required</p>
-                </div>
-                <div class="field">
                   <label class="label">Phone No.</label>
                   <div class="control has-text-left">
                     <input class="input" type="text" placeholder="Text input"
@@ -123,7 +114,6 @@ export default {
       userdata: {
         fname: {required},
         lname: {required},
-        age: {required},
         phone: {required,numeric},
         dob: {required},
         nic: {required}
@@ -133,7 +123,7 @@ export default {
       let loggedUserEmail = firebaseApp.auth().currentUser.email
       let thisState = this
 
-      firebaseApp.firestore().collection("users").where("email","==", loggedUserEmail)
+      firebaseApp.firestore().collection("collectors").where("email","==", loggedUserEmail)
         .onSnapshot(querySnapshot => {
           querySnapshot.forEach(function(doc){
             //Get user UID
@@ -155,7 +145,6 @@ export default {
         firebaseApp.firestore().collection("users").doc(thisState.uid).update({
           fname: thisState.userdata.fname,
           lname: thisState.userdata.lname,
-          age: thisState.userdata.age,
           dob: thisState.userdata.dob,
           email: thisState.userdata.email,
           phone: thisState.userdata.phone,
