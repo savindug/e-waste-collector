@@ -177,7 +177,7 @@ export default {
         .collection('jobs')
         .doc(jobId)
         .update({
-          status: 'pending'
+          status: 'active'
         })
         .then(callback => {
           //Push the job into collector
