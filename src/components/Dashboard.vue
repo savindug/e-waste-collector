@@ -17,8 +17,12 @@
           <h1 class="title is-4 ongoing-title">Ongoing Job</h1>
           <div class="columns mt-1">
             <div class="column is-2"></div>
-            <div class="column is-3 has-text-centered justify-content-center self-aligned-center">
-              <img src="https://nnimgt-a.akamaihd.net/transform/v1/crop/frm/fdcx/dc5syd-6pkhpem4t288etxj58g.jpg/r0_117_2111_1309_w1200_h678_fmax.jpg">
+            <div
+              class="column is-3 has-text-centered justify-content-center self-aligned-center"
+            >
+              <img
+                src="https://nnimgt-a.akamaihd.net/transform/v1/crop/frm/fdcx/dc5syd-6pkhpem4t288etxj58g.jpg/r0_117_2111_1309_w1200_h678_fmax.jpg"
+              />
             </div>
             <div class="column is-5 has-text-left">
               <p><b>Customer Name:</b> {{ this.ongoingjob.customerName }}</p>
@@ -27,7 +31,11 @@
               <p><b>Item Category:</b> {{ this.ongoingjob.itemCategory }}</p>
               <p><b>Sub Category:</b> {{ this.ongoingjob.subCategory }}</p>
               <button class="button is-danger mt-1">Cancel</button>
-              <button class="button is-success mt-1 ml-1">Mark as completed</button>
+              <button class="button is-success mt-1 ml-1"
+                @click="completeJob()"
+              >
+                Mark as completed
+              </button>
             </div>
             <div class="column is-2"></div>
           </div>
@@ -60,7 +68,10 @@
                 <td>{{ job.time }}</td>
                 <td>{{ job.date }}</td>
                 <td>
-                  <button class="button is-small is-warning hvr-pulse-grow">
+                  <button
+                    class="button is-small is-warning hvr-pulse-grow"
+                    @click="reserveJob(job.ref)"
+                  >
                     Reserve
                   </button>
                 </td>
@@ -90,7 +101,8 @@ export default {
       userdata: {},
       notify: false,
       notifyStatus: '',
-      ongoingjob: {}
+      ongoingjob: {},
+      userid: ''
     }
   },
   created () {
@@ -106,22 +118,23 @@ export default {
         querySnapshot => {
           querySnapshot.forEach(function (doc) {
             thisState.userdata = doc.data()
-            
-            if(doc.data().ongoing !== ''){
+            thisState.userid = doc.id.toString()
+
+            if (doc.data().ongoing !== '') {
               let ongoingid = doc.data().ongoing
               //If there is an ongoing job, fetch it
               firebaseApp
-              .firestore()
-              .collection('jobs')
-              .doc(ongoingid)
-              .onSnapshot(function(job){
-                if(job.exists){
-                  thisState.ongoingjob = job.data()
-                }else{
-                  console.log("Document does not exist")
-                }
-              })
-            }else{
+                .firestore()
+                .collection('jobs')
+                .doc(ongoingid)
+                .onSnapshot(function (job) {
+                  if (job.exists) {
+                    thisState.ongoingjob = job.data()
+                  } else {
+                    console.log('Document does not exist')
+                  }
+                })
+            } else {
               thisState.getJobsList()
             }
           })
@@ -153,6 +166,78 @@ export default {
             console.log(error)
           }
         )
+    },
+    reserveJob: function (jobId) {
+      console.log(jobId)
+      let thisState = this
+      let loggedUserEmail = firebaseApp.auth().currentUser.email
+      let currentuserid = thisState.userid
+      firebaseApp
+        .firestore()
+        .collection('jobs')
+        .doc(jobId)
+        .update({
+          status: 'pending'
+        })
+        .then(callback => {
+          //Push the job into collector
+          firebaseApp
+            .firestore()
+            .collection('collectors')
+            .doc(currentuserid)
+            .update({
+              ongoing: jobId
+            })
+            .then(callback => {
+              this.notify = true
+              this.notifyStatus = 'success'
+            })
+            .catch(error => {
+              console.log(error)
+            })
+        })
+        .catch(error => {
+          this.notify = true
+          this.notifyStatus = 'error'
+          console.log(error)
+        })
+      window.scrollTo(0, 0)
+    },
+    completeJob: function () {
+      let thisState = this
+      let currentuserid = thisState.userid
+      let jobId = thisState.userdata.ongoing
+      firebaseApp
+        .firestore()
+        .collection('jobs')
+        .doc(jobId)
+        .update({
+          status: 'completed'
+        })
+        .then(callback => {
+
+          //Remove the job from collector
+          firebaseApp
+            .firestore()
+            .collection('collectors')
+            .doc(currentuserid)
+            .update({
+              ongoing: ''
+            })
+            .then(callback => {
+              this.notify = true
+              this.notifyStatus = 'success'
+            })
+            .catch(error => {
+              console.log(error)
+            })
+        })
+        .catch(error => {
+          this.notify = true
+          this.notifyStatus = 'error'
+          console.log(error)
+        })
+      window.scrollTo(0, 0)
     }
   }
 }
@@ -161,8 +246,8 @@ export default {
 <style scoped>
 @import url('../assets/css/style.css');
 
-.dashbody{
-  height: 100vh !important
+.dashbody {
+  height: 100vh !important;
 }
 
 /* Pulse Grow */
