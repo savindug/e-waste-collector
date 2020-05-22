@@ -5,6 +5,7 @@ import {firebaseApp}  from './firebase'
 import ErrorPage from './components/ErrorPage.vue'
 import Profile from './components/Profile.vue'
 import Dashboard from './components/Dashboard.vue'
+import History from './components/History.vue'
 
 Vue.use(Router)
 
@@ -30,6 +31,14 @@ let router =  new Router({
         path: '/dashboard',
         name: 'Dashboard',
         component: Dashboard,
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/history',
+        name: 'History',
+        component: History,
         meta: {
             requiresAuth: true
         }

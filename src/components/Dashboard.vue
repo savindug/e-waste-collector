@@ -222,7 +222,8 @@ export default {
             .collection('collectors')
             .doc(currentuserid)
             .update({
-              ongoing: ''
+              ongoing: '',
+              completed: firebase.firestore.FieldValue.arrayUnion(jobId)
             })
             .then(callback => {
               this.notify = true
